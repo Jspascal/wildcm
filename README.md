@@ -5,3 +5,13 @@
 <h2>How is this app relevant ?</h2>
 
 <p>Essentially, this app provides datas about species present in Cameroon, their locations, their demographic repartitions and other specifities. This app also give details about our differents wildlife areas and how they're structured. I believe such details might be useful for tourists and organizations</p>
+
+<h2>Stack used for this project</h2>
+
+For this project I opted for a simple backend relying on very accessible tools that can run on most environments as long as you have a terminal and a simple editor. Here is the stack :
+
+<ul>
+    <li> NestJs(Express) as running server</li>
+    <li> Prisma as for Object Mapping</li>
+    <li> Postgres as database, you can find a sample of docker-compose file</li>
+</ul>
