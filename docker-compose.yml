@@ -1,14 +1,16 @@
 version: '3.8'
 services:
   dev-db:
-    image: postgres:13
+    image: postgres:12
     ports:
       - 5432:5432
     environment:
       POSTGRES_USER: josephnomo
       POSTGRES_PASSWORD: 4705
       POSTGRES_DB: wildcm
-    networks:
-      - freecodecamp
-networks:
-  freecodecamp:
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
+volumes:
+  database-data:
+    driver: local
