@@ -5,12 +5,13 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: josephnomo
-      POSTGRES_PASSWORD: 4705
-      POSTGRES_DB: wildcm
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - database-data:/var/lib/postgresql/data
 
 volumes:
   database-data:
     driver: local
+
