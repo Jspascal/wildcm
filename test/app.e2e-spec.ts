@@ -24,6 +24,7 @@ describe("App e2e", () => {
     prisma = app.get(PrismaService);
     await prisma.cleanDb();
     pactum.request.setBaseUrl("http://localhost:3333");
+    pactum.request.setDefaultTimeout(20000);
   });
   afterAll(() => {
     app.close();
@@ -70,7 +71,8 @@ describe("App e2e", () => {
           .spec()
           .post("/auth/signin")
           .withBody(dto)
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores("userAt", "access_token");
       });
       it("Throw if email empty", () => {
         return pactum
@@ -96,7 +98,17 @@ describe("App e2e", () => {
     });
   });
   describe("User", () => {
-    describe("Get me", () => { });
+    describe("Get me", () => {
+      it("fetching current user infos", () => {
+        return pactum
+          .spec()
+          .get("/users/me")
+          .withHeaders({
+            Authorization: "Bearer $S{userAt}",
+          })
+          .expectStatus(200);
+      });
+    });
 
     describe("User Edit", () => { });
   });
