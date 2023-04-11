@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   dev-db:
     image: postgres:12
@@ -11,7 +11,17 @@ services:
     volumes:
       - database-data:/var/lib/postgresql/data
 
+  test-db:
+    image: postgres:12
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
 volumes:
   database-data:
     driver: local
-
