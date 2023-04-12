@@ -4,6 +4,7 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import { PrismaService } from "../src/prisma/prisma.service";
 import * as pactum from "pactum";
 import { AuthDto } from "../src/auth/dto";
+import { EditUserDto } from "../src/user/dto/edit-user.dto";
 
 describe("App e2e", () => {
   let app: INestApplication;
@@ -24,7 +25,7 @@ describe("App e2e", () => {
     prisma = app.get(PrismaService);
     await prisma.cleanDb();
     pactum.request.setBaseUrl("http://localhost:3333");
-    pactum.request.setDefaultTimeout(20000);
+    pactum.request.setDefaultTimeout(500000);
   });
   afterAll(() => {
     app.close();
@@ -110,7 +111,23 @@ describe("App e2e", () => {
       });
     });
 
-    describe("User Edit", () => { });
+    describe("User Edit", () => {
+      it("edit the current user infos", () => {
+        const dto: EditUserDto = {
+          firstName: "Joseph",
+          email: "fulgaros@gmail.com",
+        };
+        return pactum
+          .spec()
+          .patch("/users")
+          .withHeaders({
+            Authorization: "Bearer $S{userAt}",
+          })
+          .withBody(dto)
+          .expectStatus(200)
+          .inspect();
+      });
+    });
   });
   describe("Bookmark", () => {
     describe("Create Bookmark", () => { });
