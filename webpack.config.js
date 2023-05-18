@@ -1,50 +1,50 @@
-const webpack = require('webpack');
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
+const webpack = require("webpack");
+const path = require("path");
+const nodeExternals = require("webpack-node-externals");
+const { RunScriptWebpackPlugin } = require("run-script-webpack-plugin");
 const lazyImports = [
-  'class-transformer/storage' // https://github.com/nestjs/mapped-types/issues/486#issuecomment-932715880
-]
+  "class-transformer/storage", // https://github.com/nestjs/mapped-types/issues/486#issuecomment-932715880
+];
 
 module.exports = {
-  entry: ['webpack/hot/poll?100', './src/main.ts'],
-  target: 'node',
+  entry: ["webpack/hot/poll?100", "./src/main.ts"],
+  target: "node",
   externals: [
     nodeExternals({
-      allowlist: ['webpack/hot/poll?100'],
+      allowlist: ["webpack/hot/poll?100"],
     }),
   ],
   module: {
     rules: [
       {
         test: /.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
     ],
   },
-  mode: 'development',
+  mode: "development",
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: [".tsx", ".ts", ".js"],
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new RunScriptWebpackPlugin({ name: 'server.js', autoRestart: false }),
+    new RunScriptWebpackPlugin({ name: "server.js", autoRestart: false }),
     new webpack.IgnorePlugin({
       checkResource(resource) {
         if (lazyImports.includes(resource)) {
           try {
-            require.resolve(resource)
+            require.resolve(resource);
           } catch (err) {
-            return true
+            return true;
           }
         }
-        return false
+        return false;
       },
     }),
   ],
   output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'server.js',
+    path: path.join(__dirname, "dist"),
+    filename: "server.js",
   },
 };
