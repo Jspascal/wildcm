@@ -1,27 +1,107 @@
+# version: "3.8"
+# services:
+#  dev-db:
+#    image: postgres:12
+#    ports:
+#      - 5432:5432
+#    environment:
+#      POSTGRES_USER: ${DB_USERNAME}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#      POSTGRES_DB: ${DB_NAME}
+#    volumes:
+#      - database-data:/var/lib/postgresql/data
+#
+#  test-db:
+#    image: postgres:12
+#    ports:
+#      - 5433:5432
+#    environment:
+#      POSTGRES_USER: ${DB_USERNAME}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#      POSTGRES_DB: ${DB_NAME}
+#    volumes:
+#      - database-data:/var/lib/postgresql/data
+#
+#volumes:
+#  database-data:
+#    driver: local
+#
+#=====================================================================
+#
 version: "3.8"
+
 services:
-  dev-db:
-    image: postgres:12
+  wildcm-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        CONTAINER_MODE: app
+    container_name: wildcm-service
+    depends_on:
+      - wildcm-db-dev
+      - wildcm-db-test
+      - wildcm-redis
+      - wildcm-maildev
+    environment:
+      NODE_ENV: development
+      #DB_DEV_HOST: db_dev
+      #DB_DEV_PORT: 5432
+      #DB_DEV_USERNAME: postgres
+      #DB_DEV_PASSWORD: postgres
+      #DB_DEV_DATABASE: wildcm
+      #DB_TEST_HOST: db_test
+      #DB_TEST_PORT: 5433
+      #DB_TEST_USERNAME: postgres
+      #DB_TEST_PASSWORD: postgres
+      #DB_TEST_DATABASE: wildcm-test
     ports:
-      - 5432:5432
+      - "3000:3000"
+    volumes:
+      - .:/app
+
+  wildcm-db-dev:
+    image: postgres:12
+    container_name: wildcm-db-dev
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - database-data:/var/lib/postgresql/data
-
-  test-db:
-    image: postgres:12
     ports:
-      - 5433:5432
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      - "5432:5432"
     volumes:
-      - database-data:/var/lib/postgresql/data
+      - ./data/db_dev:/var/lib/postgresql/data
 
-volumes:
-  database-data:
-    driver: local
+  wildcm-db-test:
+    image: postgres:12
+    container_name: wildcm-db-test
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: test-password
+      POSTGRES_DB: test-db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/db_test:/var/lib/postgresql/data
+
+  wildcm-maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  wildcm-redis:
+    image: redis:latest
+    container_name: wildcm-redis
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin1234!
+    ports:
+      - "5050:80"
+    depends_on:
+      - wildcm-db-dev
+    volumes:
+      - ./data/pg_admin:/var/lib/pgadmin:rw
